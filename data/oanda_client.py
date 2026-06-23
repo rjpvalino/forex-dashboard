@@ -20,8 +20,8 @@ class OandaClient:
         daily_candles  = self._get_candles(instrument, 'D', 50)
         weekly_candles = self._get_candles(instrument, 'W', 52)
 
-        daily_trend = _analyzer.analyze(daily_candles)
-        weekly_trend = _analyzer.analyze(weekly_candles)
+        daily  = _analyzer.analyze_full(daily_candles)
+        weekly = _analyzer.analyze_full(weekly_candles)
 
         daily_change = 0.0
         if len(daily_candles) >= 2:
@@ -31,17 +31,21 @@ class OandaClient:
         pip_digits = 3 if 'JPY' in instrument else 5
 
         return {
-            'instrument': instrument,
-            'display': instrument.replace('_', '/'),
-            'bid': round(bid, pip_digits),
-            'ask': round(ask, pip_digits),
-            'mid': round(mid, pip_digits),
-            'daily_change': daily_change,
-            'daily_trend': daily_trend,
-            'weekly_trend': weekly_trend,
-            'agreement': self._agreement(daily_trend, weekly_trend),
-            'base': instrument.split('_')[0],
-            'quote': instrument.split('_')[1],
+            'instrument':     instrument,
+            'display':        instrument.replace('_', '/'),
+            'bid':            round(bid, pip_digits),
+            'ask':            round(ask, pip_digits),
+            'mid':            round(mid, pip_digits),
+            'daily_change':   daily_change,
+            'daily_trend':    daily['trend'],
+            'daily_adx':      daily['adx'],
+            'daily_strength': daily['strength'],
+            'weekly_trend':   weekly['trend'],
+            'weekly_adx':     weekly['adx'],
+            'weekly_strength':weekly['strength'],
+            'agreement':      self._agreement(daily['trend'], weekly['trend']),
+            'base':           instrument.split('_')[0],
+            'quote':          instrument.split('_')[1],
         }
 
     def _get_price(self, instrument):

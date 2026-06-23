@@ -78,18 +78,29 @@ function makeRow(p, newsData) {
     <td><span class="price">${p.bid ?? '—'}</span></td>
     <td><span class="price">${p.ask ?? '—'}</span></td>
     <td>${formatChange(p.daily_change)}</td>
-    <td>${trendBadge(p.daily_trend)}</td>
-    <td>${trendBadge(p.weekly_trend)}</td>
+    <td>${trendBadge(p.daily_trend, p.daily_strength, p.daily_adx)}</td>
+    <td>${trendBadge(p.weekly_trend, p.weekly_strength, p.weekly_adx)}</td>
     <td>${agreementBadge(p.agreement)}</td>
     <td>${newsImpactCell(newsImpact)}</td>
   `;
   return tr;
 }
 
-function trendBadge(trend) {
-  if (!trend) return '<span class="badge badge-rng">— N/A</span>';
-  if (trend === 'Trending Up')   return '<span class="badge badge-up">↑ BULLISH</span>';
-  if (trend === 'Trending Down') return '<span class="badge badge-dn">↓ BEARISH</span>';
+function trendBadge(trend, strength, adx) {
+  if (!trend || trend === 'Ranging') {
+    return '<span class="badge badge-rng">↔ RANGING</span>';
+  }
+  const adxStr = adx != null ? ` <span class="adx-val">ADX ${adx}</span>` : '';
+  if (trend === 'Trending Up') {
+    if (strength === 'Strong')   return `<span class="badge badge-up-strong">↑ STRONG BULL${adxStr}</span>`;
+    if (strength === 'Moderate') return `<span class="badge badge-up">↑ BULLISH${adxStr}</span>`;
+    return `<span class="badge badge-up-weak">↑ WEAK BULL${adxStr}</span>`;
+  }
+  if (trend === 'Trending Down') {
+    if (strength === 'Strong')   return `<span class="badge badge-dn-strong">↓ STRONG BEAR${adxStr}</span>`;
+    if (strength === 'Moderate') return `<span class="badge badge-dn">↓ BEARISH${adxStr}</span>`;
+    return `<span class="badge badge-dn-weak">↓ WEAK BEAR${adxStr}</span>`;
+  }
   return '<span class="badge badge-rng">↔ RANGING</span>';
 }
 

@@ -276,15 +276,55 @@ body {
 
 /* Trend badges */
 .badge {
-  display: inline-flex; align-items: center; gap: 4px;
+  display: inline-flex; align-items: center; gap: 5px;
   font-size: 11px; font-weight: 700; letter-spacing: 1px;
   padding: 3px 10px;
   border-radius: 20px;
   border: 1px solid;
+  white-space: nowrap;
 }
-.badge-up  { color: var(--up);  border-color: rgba(0,255,136,.4);  background: rgba(0,255,136,.08);  box-shadow: var(--glow-up);  }
-.badge-dn  { color: var(--dn);  border-color: rgba(255,51,102,.4); background: rgba(255,51,102,.08); box-shadow: var(--glow-dn);  }
+
+/* Bullish tiers */
+.badge-up-strong {
+  color: #00ff88; border-color: rgba(0,255,136,.7);
+  background: rgba(0,255,136,.12);
+  box-shadow: 0 0 16px rgba(0,255,136,.55), inset 0 0 8px rgba(0,255,136,.08);
+}
+.badge-up {
+  color: #00e87a; border-color: rgba(0,255,136,.4);
+  background: rgba(0,255,136,.07);
+  box-shadow: var(--glow-up);
+}
+.badge-up-weak {
+  color: #00a854; border-color: rgba(0,255,136,.2);
+  background: rgba(0,255,136,.04);
+}
+
+/* Bearish tiers */
+.badge-dn-strong {
+  color: #ff3366; border-color: rgba(255,51,102,.7);
+  background: rgba(255,51,102,.12);
+  box-shadow: 0 0 16px rgba(255,51,102,.55), inset 0 0 8px rgba(255,51,102,.08);
+}
+.badge-dn {
+  color: #e8264d; border-color: rgba(255,51,102,.4);
+  background: rgba(255,51,102,.07);
+  box-shadow: var(--glow-dn);
+}
+.badge-dn-weak {
+  color: #a81830; border-color: rgba(255,51,102,.2);
+  background: rgba(255,51,102,.04);
+}
+
+/* Ranging */
 .badge-rng { color: var(--rng); border-color: rgba(255,215,0,.4);  background: rgba(255,215,0,.08);  box-shadow: var(--glow-rng); }
+
+/* ADX value inside badge */
+.adx-val {
+  font-size: 9px; font-family: 'Share Tech Mono', monospace;
+  opacity: 0.75; letter-spacing: 0.5px;
+  border-left: 1px solid currentColor; padding-left: 5px; margin-left: 1px;
+}
 
 /* Agreement badges */
 .agr-yes  { color: var(--pri); border-color: rgba(0,212,255,.4);  background: rgba(0,212,255,.08);  }

@@ -99,40 +99,42 @@ def manual_refresh():
 
 
 def _demo_pairs():
-    # Prices and trends reflect approximate real-market conditions (Jun 2026).
-    # Format: (instrument, bid, ask, daily_chg%, daily_trend, weekly_trend, _agr_placeholder)
+    # Format: (instrument, bid, ask, daily_chg%, daily_trend, daily_strength, weekly_trend, weekly_strength)
+    # Strength: 'Strong' (ADX>35) | 'Moderate' (25-35) | 'Weak' (20-25) | 'None' (<20 = Ranging)
     raw = [
-        # Major pairs  — verified against live chart screenshots where available
-        ('EUR_USD', 1.14256, 1.14272, -0.390, 'Trending Down', 'Ranging',       ''),
-        ('GBP_USD', 1.27143, 1.27161, -0.265, 'Trending Down', 'Ranging',       ''),
-        ('USD_JPY', 143.512, 143.531,  0.142, 'Ranging',       'Trending Down', ''),
-        ('USD_CHF', 0.89812, 0.89829, -0.088, 'Ranging',       'Ranging',       ''),
-        ('USD_CAD', 1.38124, 1.38143,  0.231, 'Ranging',       'Trending Up',   ''),
-        ('AUD_USD', 0.64218, 0.64234, -0.312, 'Trending Down', 'Ranging',       ''),
-        ('NZD_USD', 0.59012, 0.59028, -0.198, 'Trending Down', 'Ranging',       ''),
+        # Major pairs — approximate Jun 2026 market conditions
+        ('EUR_USD', 1.14256, 1.14272, -0.390, 'Trending Down', 'Moderate', 'Ranging',       'None'),
+        ('GBP_USD', 1.27143, 1.27161, -0.265, 'Trending Down', 'Weak',     'Ranging',       'None'),
+        ('USD_JPY', 143.512, 143.531,  0.142, 'Ranging',       'None',     'Trending Down', 'Moderate'),
+        ('USD_CHF', 0.89812, 0.89829, -0.088, 'Ranging',       'None',     'Ranging',       'None'),
+        ('USD_CAD', 1.38124, 1.38143,  0.231, 'Ranging',       'None',     'Trending Up',   'Weak'),
+        ('AUD_USD', 0.64218, 0.64234, -0.312, 'Trending Down', 'Moderate', 'Ranging',       'None'),
+        ('NZD_USD', 0.59012, 0.59028, -0.198, 'Trending Down', 'Weak',     'Ranging',       'None'),
         # Minor pairs
-        ('EUR_GBP', 0.89823, 0.89841,  0.112, 'Ranging',       'Ranging',       ''),
-        ('EUR_JPY', 163.912, 163.941, -0.251, 'Trending Down', 'Ranging',       ''),
-        ('EUR_AUD', 1.77812, 1.77849, -0.078, 'Ranging',       'Ranging',       ''),
-        ('EUR_CAD', 1.57712, 1.57749, -0.162, 'Trending Down', 'Ranging',       ''),
-        ('EUR_CHF', 1.02512, 1.02531,  0.041, 'Ranging',       'Ranging',       ''),
-        ('EUR_NZD', 1.93512, 1.93551, -0.198, 'Trending Down', 'Ranging',       ''),
-        ('GBP_JPY', 182.312, 182.341, -0.123, 'Trending Down', 'Ranging',       ''),
-        ('GBP_AUD', 1.97812, 1.97849, -0.048, 'Ranging',       'Ranging',       ''),
-        ('GBP_CAD', 1.75512, 1.75549, -0.041, 'Ranging',       'Ranging',       ''),
-        ('GBP_CHF', 1.14112, 1.14141,  0.178, 'Ranging',       'Ranging',       ''),
-        ('GBP_NZD', 2.15312, 2.15361, -0.067, 'Ranging',       'Ranging',       ''),
-        ('AUD_JPY', 92.1120, 92.1340, -0.451, 'Trending Down', 'Trending Down', ''),
-        ('AUD_CAD', 0.88712, 0.88729,  0.089, 'Ranging',       'Ranging',       ''),
-        ('AUD_CHF', 0.57612, 0.57629, -0.234, 'Trending Down', 'Trending Down', ''),
-        ('AUD_NZD', 1.08712, 1.08731,  0.022, 'Ranging',       'Ranging',       ''),
-        ('CAD_JPY', 103.912, 103.931, -0.089, 'Ranging',       'Trending Down', ''),
-        ('CAD_CHF', 0.65012, 0.65029, -0.112, 'Ranging',       'Ranging',       ''),
-        ('NZD_JPY', 84.7120, 84.7310, -0.389, 'Trending Down', 'Trending Down', ''),
-        ('NZD_CAD', 0.81512, 0.81529,  0.044, 'Ranging',       'Ranging',       ''),
-        ('NZD_CHF', 0.52912, 0.52929, -0.178, 'Trending Down', 'Trending Down', ''),
-        ('CHF_JPY', 159.812, 159.843,  0.231, 'Ranging',       'Ranging',       ''),
+        ('EUR_GBP', 0.89823, 0.89841,  0.112, 'Ranging',       'None',     'Ranging',       'None'),
+        ('EUR_JPY', 163.912, 163.941, -0.251, 'Trending Down', 'Moderate', 'Ranging',       'None'),
+        ('EUR_AUD', 1.77812, 1.77849, -0.078, 'Ranging',       'None',     'Ranging',       'None'),
+        ('EUR_CAD', 1.57712, 1.57749, -0.162, 'Trending Down', 'Weak',     'Ranging',       'None'),
+        ('EUR_CHF', 1.02512, 1.02531,  0.041, 'Ranging',       'None',     'Ranging',       'None'),
+        ('EUR_NZD', 1.93512, 1.93551, -0.198, 'Trending Down', 'Weak',     'Ranging',       'None'),
+        ('GBP_JPY', 182.312, 182.341, -0.123, 'Trending Down', 'Weak',     'Ranging',       'None'),
+        ('GBP_AUD', 1.97812, 1.97849, -0.048, 'Ranging',       'None',     'Ranging',       'None'),
+        ('GBP_CAD', 1.75512, 1.75549, -0.041, 'Ranging',       'None',     'Ranging',       'None'),
+        ('GBP_CHF', 1.14112, 1.14141,  0.178, 'Ranging',       'None',     'Ranging',       'None'),
+        ('GBP_NZD', 2.15312, 2.15361, -0.067, 'Ranging',       'None',     'Ranging',       'None'),
+        ('AUD_JPY', 92.1120, 92.1340, -0.451, 'Trending Down', 'Strong',   'Trending Down', 'Moderate'),
+        ('AUD_CAD', 0.88712, 0.88729,  0.089, 'Ranging',       'None',     'Ranging',       'None'),
+        ('AUD_CHF', 0.57612, 0.57629, -0.234, 'Trending Down', 'Moderate', 'Trending Down', 'Weak'),
+        ('AUD_NZD', 1.08712, 1.08731,  0.022, 'Ranging',       'None',     'Ranging',       'None'),
+        ('CAD_JPY', 103.912, 103.931, -0.089, 'Ranging',       'None',     'Trending Down', 'Weak'),
+        ('CAD_CHF', 0.65012, 0.65029, -0.112, 'Ranging',       'None',     'Ranging',       'None'),
+        ('NZD_JPY', 84.7120, 84.7310, -0.389, 'Trending Down', 'Strong',   'Trending Down', 'Moderate'),
+        ('NZD_CAD', 0.81512, 0.81529,  0.044, 'Ranging',       'None',     'Ranging',       'None'),
+        ('NZD_CHF', 0.52912, 0.52929, -0.178, 'Trending Down', 'Moderate', 'Trending Down', 'Weak'),
+        ('CHF_JPY', 159.812, 159.843,  0.231, 'Ranging',       'None',     'Ranging',       'None'),
     ]
+
+    STRENGTH_ADX = {'Strong': 38.4, 'Moderate': 28.7, 'Weak': 22.1, 'None': 14.3}
 
     def agr(d, w):
         if d == w and d != 'Ranging': return 'Yes'
@@ -140,20 +142,24 @@ def _demo_pairs():
         return 'No'
 
     pairs = []
-    for instr, bid, ask, chg, dt, wt, _ in raw:
+    for instr, bid, ask, chg, dt, ds, wt, ws in raw:
         pip = 3 if 'JPY' in instr else 5
         pairs.append({
-            'instrument': instr,
-            'display': instr.replace('_', '/'),
-            'bid': round(bid, pip),
-            'ask': round(ask, pip),
-            'mid': round((bid + ask) / 2, pip),
-            'daily_change': chg,
-            'daily_trend': dt,
-            'weekly_trend': wt,
-            'agreement': agr(dt, wt),
-            'base': instr.split('_')[0],
-            'quote': instr.split('_')[1],
+            'instrument':      instr,
+            'display':         instr.replace('_', '/'),
+            'bid':             round(bid, pip),
+            'ask':             round(ask, pip),
+            'mid':             round((bid + ask) / 2, pip),
+            'daily_change':    chg,
+            'daily_trend':     dt,
+            'daily_strength':  ds,
+            'daily_adx':       STRENGTH_ADX[ds],
+            'weekly_trend':    wt,
+            'weekly_strength': ws,
+            'weekly_adx':      STRENGTH_ADX[ws],
+            'agreement':       agr(dt, wt),
+            'base':            instr.split('_')[0],
+            'quote':           instr.split('_')[1],
         })
     return pairs
 
