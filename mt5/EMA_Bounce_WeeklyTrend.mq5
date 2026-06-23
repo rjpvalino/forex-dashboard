@@ -123,9 +123,8 @@ int OnInit()
     g_trade.SetExpertMagicNumber(Inp_Magic);
     g_trade.SetDeviationInPoints(20);
 
-    // Prefer RETURN filling; fall back to IOC on brokers that don't support it
-    if(!g_trade.SetTypeFilling(ORDER_FILLING_RETURN))
-        g_trade.SetTypeFilling(ORDER_FILLING_IOC);
+    // RETURN filling works for most forex brokers; change to FOK if your broker requires it
+    g_trade.SetTypeFilling(ORDER_FILLING_RETURN);
 
     if(Inp_Verbose)
         PrintFormat("EMABounce EA v1.00 | %s | Magic %I64d | Risk %.1f%% | SL %.1fx ATR | TP %.1fx ATR | MaxHold %d bars",
@@ -163,7 +162,7 @@ void OnTick()
     if(HasOpenPosition()) return;
 
     // ── Step 3: weekly ADX / DI ─────────────────────────────────
-    double wAdx[3], wPlus[3], wMinus[3];
+    double wAdx[], wPlus[], wMinus[];   // dynamic — ArraySetAsSeries requires dynamic arrays
     ArraySetAsSeries(wAdx,   true);
     ArraySetAsSeries(wPlus,  true);
     ArraySetAsSeries(wMinus, true);
@@ -190,7 +189,7 @@ void OnTick()
     if(!wUp && !wDown) return;
 
     // ── Step 4: daily EMA / RSI / ATR (bar[1] = yesterday) ──────
-    double dEma[3], dRsi[3], dAtr[3];
+    double dEma[], dRsi[], dAtr[];   // dynamic — ArraySetAsSeries requires dynamic arrays
     ArraySetAsSeries(dEma, true);
     ArraySetAsSeries(dRsi, true);
     ArraySetAsSeries(dAtr, true);
