@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Forex Live Dashboard | Richard Valino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loader-wrap">
+      <div class="loader-ring r1"></div>
+      <div class="loader-ring r2"></div>
+      <div class="loader-ring r3"></div>
+      <div class="loader-text">INITIALIZING</div>
+    </div>
+  </div>
+
+  <!-- Background -->
+  <div class="bg-grid"></div>
+  <div class="bg-blob b1"></div>
+  <div class="bg-blob b2"></div>
+
+  <div class="page">
+
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <header class="hdr">
+      <div class="hdr-left">
+        <span class="badge-live">● LIVE</span>
+        <div>
+          <h1 class="hdr-title">FOREX LIVE DASHBOARD</h1>
+          <p class="hdr-sub">Real-Time Market Analysis &amp; Intelligence</p>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <div class="hdr-meta">
+          <span class="meta-lbl">LAST UPDATED</span>
+          <span id="last-updated" class="meta-val">—</span>
+        </div>
+        <button id="refresh-btn" class="btn-refresh" onclick="refreshData()">
+          <span id="refresh-icon" class="ri">⟳</span> REFRESH
+        </button>
+        <div class="hdr-credit">by Richard Valino</div>
+      </div>
+    </header>
+
+    <!-- ── Error banner ──────────────────────────────────────── -->
+    <div id="error-banner" class="error-banner hidden">
+      <span>⚠</span> <span id="error-msg"></span>
+    </div>
+
+    <!-- ── Filters ───────────────────────────────────────────── -->
+    <section class="filters">
+      <div class="fg">
+        <span class="flbl">PAIRS</span>
+        <div class="pills">
+          <button class="pill active" onclick="setFilter('type','all',this)">ALL</button>
+          <button class="pill" onclick="setFilter('type','major',this)">MAJOR</button>
+          <button class="pill" onclick="setFilter('type','minor',this)">MINOR</button>
+        </div>
+      </div>
+      <div class="fg">
+        <span class="flbl">TREND</span>
+        <div class="pills">
+          <button class="pill active" onclick="setFilter('trend','all',this)">ALL</button>
+          <button class="pill p-up" onclick="setFilter('trend','up',this)">↑ BULLISH</button>
+          <button class="pill p-dn" onclick="setFilter('trend','down',this)">↓ BEARISH</button>
+          <button class="pill p-rng" onclick="setFilter('trend','ranging',this)">↔ RANGING</button>
+        </div>
+      </div>
+      <div class="fg">
+        <span class="flbl">ALIGNMENT</span>
+        <div class="pills">
+          <button class="pill active" onclick="setFilter('agreement','all',this)">ALL</button>
+          <button class="pill p-pri" onclick="setFilter('agreement','yes',this)">✓ CONFIRMED</button>
+          <button class="pill" onclick="setFilter('agreement','partial',this)">~ PARTIAL</button>
+          <button class="pill p-dn" onclick="setFilter('agreement','no',this)">✗ CONFLICT</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Stats bar ─────────────────────────────────────────── -->
+    <div class="stats-bar">
+      <div class="stat"><span class="slbl">PAIRS SHOWN</span><span class="sval" id="s-total">—</span></div>
+      <div class="stat"><span class="slbl">↑ BULLISH</span><span class="sval c-up" id="s-up">—</span></div>
+      <div class="stat"><span class="slbl">↓ BEARISH</span><span class="sval c-dn" id="s-dn">—</span></div>
+      <div class="stat"><span class="slbl">↔ RANGING</span><span class="sval c-rng" id="s-rng">—</span></div>
+      <div class="stat"><span class="slbl">✓ CONFIRMED</span><span class="sval c-pri" id="s-conf">—</span></div>
+      <div class="stat-div"></div>
+      <div class="stat"><span class="slbl">AUTO-REFRESH</span><span class="sval">6:00 AM CT</span></div>
+    </div>
+
+    <!-- ── Major Pairs ───────────────────────────────────────── -->
+    <section class="pairs-section" id="sec-major">
+      <div class="sec-hdr">
+        <h2 class="sec-title">MAJOR PAIRS</h2>
+        <span class="sec-count" id="cnt-major">—</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="ptbl" id="tbl-major">
+          <thead><tr>
+            <th>PAIR</th>
+            <th>BID</th>
+            <th>ASK</th>
+            <th>DAILY CHG</th>
+            <th>DAILY TREND</th>
+            <th>WEEKLY TREND</th>
+            <th>D/W ALIGNMENT</th>
+            <th>NEWS IMPACT</th>
+          </tr></thead>
+          <tbody id="body-major"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── Minor Pairs ───────────────────────────────────────── -->
+    <section class="pairs-section" id="sec-minor">
+      <div class="sec-hdr">
+        <h2 class="sec-title">MINOR PAIRS</h2>
+        <span class="sec-count" id="cnt-minor">—</span>
+      </div>
+      <div class="tbl-wrap">
+        <table class="ptbl" id="tbl-minor">
+          <thead><tr>
+            <th>PAIR</th>
+            <th>BID</th>
+            <th>ASK</th>
+            <th>DAILY CHG</th>
+            <th>DAILY TREND</th>
+            <th>WEEKLY TREND</th>
+            <th>D/W ALIGNMENT</th>
+            <th>NEWS IMPACT</th>
+          </tr></thead>
+          <tbody id="body-minor"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ── News Section ──────────────────────────────────────── -->
+    <section class="news-section">
+      <div class="sec-hdr">
+        <h2 class="sec-title">HIGH IMPACT NEWS &amp; EVENTS</h2>
+        <span class="sec-sub">Source: ForexFactory.com · High Impact · Bank Holidays · Scheduled Speeches</span>
+      </div>
+      <div class="currency-tabs" id="ctabs"></div>
+      <div class="news-panels" id="npanels">
+        <div class="news-empty">Loading news data…</div>
+      </div>
+    </section>
+
+    <!-- ── Footer ────────────────────────────────────────────── -->
+    <footer class="footer">
+      <p>FOREX LIVE DASHBOARD &copy; 2024 · Richard Valino · Sample Portfolio Project</p>
+      <p class="footer-disc">Data sourced from OANDA &amp; ForexFactory.com · Not financial advice · For educational purposes only.</p>
+    </footer>
+
+  </div><!-- .page -->
+
+  <script src="/static/js/dashboard.js"></script>
+</body>
+</html>
