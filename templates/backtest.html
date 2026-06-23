@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strategy Backtester | Richard Valino</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-blob b1"></div>
+  <div class="bg-blob b2"></div>
+
+  <div class="page">
+
+    <!-- ── Header ──────────────────────────────────────────────────── -->
+    <header class="hdr">
+      <div class="hdr-left">
+        <a href="/" class="btn-back">← DASHBOARD</a>
+        <div>
+          <h1 class="hdr-title">STRATEGY BACKTESTER</h1>
+          <p class="hdr-sub">ADX Trend Confluence &nbsp;|&nbsp; Walk-Forward Simulation &nbsp;|&nbsp; ~2 Years Daily Data</p>
+        </div>
+      </div>
+      <div class="hdr-right">
+        <div class="hdr-credit">by Richard Valino</div>
+      </div>
+    </header>
+
+    <!-- ── Strategy definition card ────────────────────────────────── -->
+    <section class="bt-card bt-strategy">
+      <div class="bt-card-title">
+        <span class="bt-icon">⚡</span> STRATEGY RULES
+      </div>
+      <div class="strategy-grid">
+        <div class="srule">
+          <span class="srule-lbl">ENTRY LONG</span>
+          <span class="srule-val">Daily ADX ≥ 25 (Trending Up) <em>and</em> Weekly ADX ≥ 20 (Trending Up) — confirmed on 2 consecutive daily bars</span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">ENTRY SHORT</span>
+          <span class="srule-val">Daily ADX ≥ 25 (Trending Down) <em>and</em> Weekly ADX ≥ 20 (Trending Down) — confirmed on 2 consecutive daily bars</span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">STOP LOSS</span>
+          <span class="srule-val">1.5 × ATR(14) from entry price</span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">TAKE PROFIT</span>
+          <span class="srule-val">2.5 × ATR(14) from entry price &nbsp;<span class="rr-tag">R:R ≈ 1.67</span></span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">TRAILING STOP</span>
+          <span class="srule-val">Move stop to breakeven once +1 × ATR profit is reached</span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">MAX HOLD</span>
+          <span class="srule-val">30 trading bars — exit at market close if SL / TP not hit</span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">RISK / TRADE</span>
+          <span class="srule-val">1% of current equity per trade &nbsp;|&nbsp; Starting equity: $10,000</span>
+        </div>
+        <div class="srule">
+          <span class="srule-lbl">DATA</span>
+          <span class="srule-val">~500 daily bars per major pair (~2 years) &nbsp;|&nbsp; No look-ahead bias</span>
+        </div>
+      </div>
+      <div class="bt-run-row">
+        <button id="run-btn" class="btn-run" onclick="runBacktest()">
+          <span id="run-icon">▶</span> RUN BACKTEST
+        </button>
+        <span id="bt-status-msg" class="bt-status-idle">Click to run on all 7 major pairs</span>
+      </div>
+    </section>
+
+    <!-- ── Demo notice (shown when no OANDA creds) ────────────────── -->
+    <div id="demo-notice" class="demo-notice hidden">
+      ⚠ Running on synthetic price data — connect OANDA credentials in <code>.env</code> for live historical backtest.
+    </div>
+
+    <!-- ── Results section ─────────────────────────────────────────── -->
+    <div id="bt-results" class="hidden">
+
+      <!-- Summary stats ─────────────────────────────────────────── -->
+      <section class="bt-card bt-summary">
+        <div class="bt-card-title"><span class="bt-icon">📊</span> PORTFOLIO SUMMARY</div>
+        <div class="bt-sum-grid">
+          <div class="bt-stat">
+            <span class="bt-stat-val" id="sum-trades">—</span>
+            <span class="bt-stat-lbl">TOTAL TRADES</span>
+          </div>
+          <div class="bt-stat">
+            <span class="bt-stat-val" id="sum-wr">—</span>
+            <span class="bt-stat-lbl">WIN RATE</span>
+          </div>
+          <div class="bt-stat">
+            <span class="bt-stat-val" id="sum-pf">—</span>
+            <span class="bt-stat-lbl">PROFIT FACTOR</span>
+          </div>
+          <div class="bt-stat">
+            <span class="bt-stat-val" id="sum-ret">—</span>
+            <span class="bt-stat-lbl">AVG RETURN / PAIR</span>
+          </div>
+          <div class="bt-stat">
+            <span class="bt-stat-val" id="sum-dd">—</span>
+            <span class="bt-stat-lbl">AVG MAX DRAWDOWN</span>
+          </div>
+          <div class="bt-stat">
+            <span class="bt-stat-val" id="sum-exp">—</span>
+            <span class="bt-stat-lbl">AVG EXPECTANCY</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Per-pair table ───────────────────────────────────────── -->
+      <section class="bt-card">
+        <div class="bt-card-title"><span class="bt-icon">📋</span> PER-PAIR RESULTS</div>
+        <div class="tbl-wrap">
+          <table class="ptbl bt-tbl" id="bt-pair-tbl">
+            <thead>
+              <tr>
+                <th>PAIR</th>
+                <th>TRADES</th>
+                <th>W</th>
+                <th>L</th>
+                <th>WIN %</th>
+                <th>PROFIT FACTOR</th>
+                <th>AVG WIN</th>
+                <th>AVG LOSS</th>
+                <th>EXPECTANCY</th>
+                <th>NET P&amp;L</th>
+                <th>RETURN %</th>
+                <th>MAX DD%</th>
+                <th>CURVE</th>
+              </tr>
+            </thead>
+            <tbody id="bt-pair-body"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Equity curve chart ───────────────────────────────────── -->
+      <section class="bt-card">
+        <div class="bt-card-title">
+          <span class="bt-icon">📈</span> EQUITY CURVES
+          <span class="chart-hint">Each line = one pair starting at $10,000</span>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="equity-chart"></canvas>
+        </div>
+      </section>
+
+      <!-- Trade log ────────────────────────────────────────────── -->
+      <section class="bt-card">
+        <div class="bt-card-title">
+          <span class="bt-icon">📝</span> TRADE LOG
+          <button class="btn-toggle-log" onclick="toggleLog()">SHOW / HIDE</button>
+        </div>
+        <div id="trade-log-wrap" class="trade-log-wrap hidden">
+          <div class="tbl-wrap">
+            <table class="ptbl bt-tbl" id="trade-log-tbl">
+              <thead>
+                <tr>
+                  <th>PAIR</th>
+                  <th>DIR</th>
+                  <th>ENTRY</th>
+                  <th>EXIT</th>
+                  <th>REASON</th>
+                  <th>BARS</th>
+                  <th>P&amp;L $</th>
+                  <th>D-ADX</th>
+                  <th>W-ADX</th>
+                </tr>
+              </thead>
+              <tbody id="trade-log-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+    </div><!-- /#bt-results -->
+
+  </div><!-- /.page -->
+
+  <footer class="footer">
+    <span>Forex Strategy Backtester &copy; 2026 Richard Valino &nbsp;|&nbsp; Strategy: ADX Trend Confluence &nbsp;|&nbsp; For informational purposes only — not financial advice</span>
+  </footer>
+
+  <script src="/static/js/backtest.js"></script>
+</body>
+</html>

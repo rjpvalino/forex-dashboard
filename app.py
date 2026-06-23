@@ -12,6 +12,7 @@ load_dotenv()
 from data.oanda_client import OandaClient
 from data.forex_factory import ForexFactoryClient
 from data.news_analyzer import NewsAnalyzer
+from backtest.engine import BacktestEngine
 
 app = Flask(__name__)
 logging.basicConfig(level=logging.INFO, format='%(asctime)s %(levelname)s %(message)s')
@@ -26,6 +27,7 @@ MINOR_PAIRS = [
 ]
 
 _cache = {'pairs': [], 'news': {}, 'last_updated': None, 'error': None}
+_bt_cache = {'results': None, 'timestamp': None, 'running': False, 'is_demo': True}
 
 
 def refresh_data():
@@ -196,6 +198,79 @@ def _demo_news():
         for cur, evt, imp, time, act, fore, prev in raw_events
     ]
     return analyzer.analyze(events)
+
+
+@app.route('/backtest')
+def backtest_page():
+    return render_template('backtest.html')
+
+
+@app.route('/api/backtest', methods=['POST'])
+def run_backtest():
+    global _bt_cache
+    if _bt_cache.get('running'):
+        return jsonify({'error': 'Backtest already running, please wait'}), 429
+
+    _bt_cache['running'] = True
+    try:
+        engine = BacktestEngine(initial_equity=10000.0, risk_pct=0.01)
+        api_key = os.getenv('OANDA_API_KEY')
+        account_id = os.getenv('OANDA_ACCOUNT_ID')
+        is_demo = not bool(api_key and account_id)
+
+        if not is_demo:
+            environment = os.getenv('OANDA_ENVIRONMENT', 'practice')
+            client = OandaClient(api_key, account_id, environment)
+            results = []
+            for instr in MAJOR_PAIRS:
+                try:
+                    candles = client._get_candles(instr, 'D', 500)
+                    r = engine.run(instr, candles)
+                    if r:
+                        results.append(r)
+                    logger.info(f"Backtest {instr}: {r['total_trades'] if r else 0} trades")
+                except Exception as e:
+                    logger.error(f"Backtest error {instr}: {e}")
+        else:
+            results = engine.run_demo()
+
+        _bt_cache.update({
+            'results': results,
+            'timestamp': datetime.now(pytz.UTC).isoformat(),
+            'is_demo': is_demo,
+        })
+    except Exception as e:
+        logger.error(f"Backtest failed: {e}")
+        return jsonify({'error': str(e)}), 500
+    finally:
+        _bt_cache['running'] = False
+
+    return jsonify({
+        'results': _bt_cache['results'],
+        'timestamp': _bt_cache['timestamp'],
+        'is_demo': is_demo,
+        'strategy': {
+            'name': 'ADX Trend Confluence',
+            'entry_long':  'Daily ADX ≥ 25 (Trending Up) + Weekly ADX ≥ 20 (Trending Up) — 2 consecutive bars',
+            'entry_short': 'Daily ADX ≥ 25 (Trending Down) + Weekly ADX ≥ 20 (Trending Down) — 2 consecutive bars',
+            'sl':          '1.5 × ATR(14)',
+            'tp':          '2.5 × ATR(14)  [R:R ≈ 1.67]',
+            'trail':       'Move stop to breakeven once +1 × ATR in profit',
+            'max_hold':    '30 trading bars (exit at market)',
+            'risk':        '1% of current equity per trade',
+            'data':        '~500 daily bars per pair  (~2 years)',
+        }
+    })
+
+
+@app.route('/api/backtest/status')
+def backtest_status():
+    return jsonify({
+        'has_results': _bt_cache['results'] is not None,
+        'running': _bt_cache.get('running', False),
+        'timestamp': _bt_cache.get('timestamp'),
+        'is_demo': _bt_cache.get('is_demo', True),
+    })
 
 
 if __name__ == '__main__':
