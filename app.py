@@ -193,10 +193,9 @@ def _demo_news():
 
 
 if __name__ == '__main__':
-    # 6:00 AM Central = 12:00 PM UTC (CST) / 11:00 AM UTC (CDT)
-    # Using UTC 12:00 as a safe default; adjust for DST if needed
-    scheduler = BackgroundScheduler(timezone=pytz.UTC)
-    scheduler.add_job(refresh_data, CronTrigger(hour=12, minute=0, timezone=pytz.UTC))
+    central = pytz.timezone('America/Chicago')
+    scheduler = BackgroundScheduler(timezone=central)
+    scheduler.add_job(refresh_data, CronTrigger(hour=6, minute=0, timezone=central))
     scheduler.start()
     refresh_data()
     try:
