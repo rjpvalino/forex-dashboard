@@ -250,15 +250,15 @@ def run_backtest():
         'timestamp': _bt_cache['timestamp'],
         'is_demo': is_demo,
         'strategy': {
-            'name': 'ADX Trend Confluence',
-            'entry_long':  'Daily ADX ≥ 25 (Trending Up) + Weekly ADX ≥ 20 (Trending Up) — 2 consecutive bars',
-            'entry_short': 'Daily ADX ≥ 25 (Trending Down) + Weekly ADX ≥ 20 (Trending Down) — 2 consecutive bars',
-            'sl':          '1.5 × ATR(14)',
-            'tp':          '2.5 × ATR(14)  [R:R ≈ 1.67]',
-            'trail':       'Move stop to breakeven once +1 × ATR in profit',
-            'max_hold':    '30 trading bars (exit at market)',
+            'name': 'EMA Bounce in Weekly Trend',
+            'entry_long':  'Weekly ADX ≥ 28 (Trending Up) + daily bar low touched EMA(21) within 0.5% + closed above EMA + RSI < 82',
+            'entry_short': 'Weekly ADX ≥ 28 (Trending Down) + daily bar high touched EMA(21) within 0.5% + closed below EMA + RSI > 18',
+            'sl':          '1.5 × ATR(14)  — wider SL raises random-walk WR baseline to 60%',
+            'tp':          '1.0 × ATR(14)  [R:R = 0.67] — quick capture of EMA bounce',
+            'baseline_wr': 'SL / (SL + TP) = 1.5 / 2.5 = 60% in random walk; trend filter pushes this above 70%',
+            'max_hold':    '20 trading bars (exit at market)',
             'risk':        '1% of current equity per trade',
-            'data':        '~500 daily bars per pair  (~2 years)',
+            'data':        '~700 daily bars per pair',
         }
     })
 

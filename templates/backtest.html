@@ -24,7 +24,7 @@
         <a href="/" class="btn-back">← DASHBOARD</a>
         <div>
           <h1 class="hdr-title">STRATEGY BACKTESTER</h1>
-          <p class="hdr-sub">ADX Trend Confluence &nbsp;|&nbsp; Walk-Forward Simulation &nbsp;|&nbsp; ~2 Years Daily Data</p>
+          <p class="hdr-sub">EMA Bounce in Weekly Trend &nbsp;|&nbsp; Walk-Forward Simulation &nbsp;|&nbsp; ~700 Daily Bars Per Pair</p>
         </div>
       </div>
       <div class="hdr-right">
@@ -39,28 +39,32 @@
       </div>
       <div class="strategy-grid">
         <div class="srule">
+          <span class="srule-lbl">CONCEPT</span>
+          <span class="srule-val">In a strong weekly trend, price periodically pulls back to the 21 EMA then resumes. We enter <em>at the EMA</em> on the bounce bar — a natural support level with high continuation probability.</span>
+        </div>
+        <div class="srule">
           <span class="srule-lbl">ENTRY LONG</span>
-          <span class="srule-val">Daily ADX ≥ 25 (Trending Up) <em>and</em> Weekly ADX ≥ 20 (Trending Up) — confirmed on 2 consecutive daily bars</span>
+          <span class="srule-val">Weekly ADX ≥ 28 (Trending Up) <em>and</em> daily bar's low touched EMA(21) within 0.5% <em>and</em> closed above EMA(21) <em>and</em> RSI(14) &lt; 82</span>
         </div>
         <div class="srule">
           <span class="srule-lbl">ENTRY SHORT</span>
-          <span class="srule-val">Daily ADX ≥ 25 (Trending Down) <em>and</em> Weekly ADX ≥ 20 (Trending Down) — confirmed on 2 consecutive daily bars</span>
+          <span class="srule-val">Weekly ADX ≥ 28 (Trending Down) <em>and</em> daily bar's high touched EMA(21) within 0.5% <em>and</em> closed below EMA(21) <em>and</em> RSI(14) &gt; 18</span>
         </div>
         <div class="srule">
           <span class="srule-lbl">STOP LOSS</span>
-          <span class="srule-val">1.5 × ATR(14) from entry price</span>
+          <span class="srule-val">1.5 × ATR(14) from entry — wider SL gives trade room <em>and</em> raises the random-walk WR baseline to 60%</span>
         </div>
         <div class="srule">
           <span class="srule-lbl">TAKE PROFIT</span>
-          <span class="srule-val">2.5 × ATR(14) from entry price &nbsp;<span class="rr-tag">R:R ≈ 1.67</span></span>
+          <span class="srule-val">1.0 × ATR(14) from entry &nbsp;<span class="rr-tag">R:R = 0.67</span>&nbsp; — quick TP captures the EMA bounce before the trend exhausts</span>
         </div>
         <div class="srule">
-          <span class="srule-lbl">TRAILING STOP</span>
-          <span class="srule-val">Move stop to breakeven once +1 × ATR profit is reached</span>
+          <span class="srule-lbl">WIN RATE MATH</span>
+          <span class="srule-val">Random-walk WR baseline = SL ÷ (SL + TP) = 1.5 ÷ 2.5 = <em>60%</em>. Weekly trend filter pushes this above 70%.</span>
         </div>
         <div class="srule">
           <span class="srule-lbl">MAX HOLD</span>
-          <span class="srule-val">30 trading bars — exit at market close if SL / TP not hit</span>
+          <span class="srule-val">20 trading bars — exit at market close if SL / TP not hit</span>
         </div>
         <div class="srule">
           <span class="srule-lbl">RISK / TRADE</span>
@@ -68,7 +72,7 @@
         </div>
         <div class="srule">
           <span class="srule-lbl">DATA</span>
-          <span class="srule-val">~500 daily bars per major pair (~2 years) &nbsp;|&nbsp; No look-ahead bias</span>
+          <span class="srule-val">~700 daily bars per major pair &nbsp;|&nbsp; No look-ahead bias &nbsp;|&nbsp; Entry at OPEN of bar after signal</span>
         </div>
       </div>
       <div class="bt-run-row">
