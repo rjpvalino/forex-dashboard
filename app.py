@@ -1,6 +1,7 @@
 from flask import Flask, render_template, jsonify
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
+import atexit
 import pytz
 import logging
 import os
@@ -273,13 +274,13 @@ def backtest_status():
     })
 
 
+central = pytz.timezone('America/Chicago')
+_scheduler = BackgroundScheduler(timezone=central)
+_scheduler.add_job(refresh_data, CronTrigger(hour=6, minute=0, timezone=central))
+_scheduler.start()
+atexit.register(_scheduler.shutdown)
+
 if __name__ == '__main__':
-    central = pytz.timezone('America/Chicago')
-    scheduler = BackgroundScheduler(timezone=central)
-    scheduler.add_job(refresh_data, CronTrigger(hour=6, minute=0, timezone=central))
-    scheduler.start()
     refresh_data()
-    try:
-        app.run(debug=False, host='0.0.0.0', port=5000)
-    finally:
-        scheduler.shutdown()
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
